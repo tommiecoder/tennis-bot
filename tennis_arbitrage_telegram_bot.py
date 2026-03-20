@@ -12,6 +12,8 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+
 ODDS_TRACKER = {}
 
 def detect_spike(match_id, current_odds):
@@ -607,11 +609,9 @@ def main():
         sys.exit(1)
     
     # Build application
-    application = (
-        ApplicationBuilder()
-        .token(bot_state.config.telegram_token)
-        .build()
-    )
+    application = ApplicationBuilder().token(
+        bot_state.config.telegram_token
+    ).concurrent_updates(True).build()
     
     # Add handlers
     application.add_handler(CommandHandler("start", start_command))
