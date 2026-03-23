@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, List, Tuple, Any
 from dataclasses import dataclass, field
 from functools import wraps
+from telegram.ext import ApplicationBuilder
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -609,9 +610,15 @@ def main():
         sys.exit(1)
     
     # Build application
-    application = ApplicationBuilder().token(
-        bot_state.config.telegram_token
-    ).concurrent_updates(True).build()
+    
+    
+    application = (
+        ApplicationBuilder()
+        .token(bot_state.config.telegram_token)
+        .build()
+    )
+    
+    application.job_queue.start()
     
     # Add handlers
     application.add_handler(CommandHandler("start", start_command))
@@ -628,6 +635,10 @@ def main():
     print("Send /start to your bot on Telegram")
     
     application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+if __name__ == "__main__":
+    main()
+
 
 if __name__ == "__main__":
     main()
